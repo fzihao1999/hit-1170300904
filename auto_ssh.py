@@ -170,11 +170,16 @@ def main():
     filename = sys.argv[1]
     print "[+] Loading file : %s" % (filename)
 
+    thread_list = []
     with open(filename, "r") as f:
         for line in f:
             line = line.rstrip("\n")
-            connect_ssh(line,auth)
-
+            thread_list.append(threading.Thread(target=connect_ssh, args=(line, auth,)))
+    for t in thread_list:
+        t.start()
+    for t in thread_list:
+        t.join()
+    thread_list = []
 
     print "[+] Login step finished!"
     print "[+] Got [%d] clients!" % (len(ssh_clients))
